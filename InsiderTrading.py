@@ -4,12 +4,14 @@ import pandas as pd
 from IPython.display import clear_output
 from tqdm import tqdm
 
+TICKER_EDGAR_CIK_CSV_PATH = 'ticker_and_edgar_cik.csv'
+TICKER_EDGAR_CIK = None
+
 
 def main():
     """Pulls insider trading statistics"""
-    #TODO: Add global for edgar csv
-    #TODO: make the opened csv the value of the global
-    ticker_csv = pd.read_csv('ticker_and_edgar_cik.csv', delimiter=',')
+    #TODO: Switch on user input to determine which csv to use
+    ticker_csv = pd.read_csv(TICKER_EDGAR_CIK_CSV_PATH, delimiter=',')
     symbols = [i.upper() for i in ticker_csv.Ticker]
     
     end = '2020-01-01'
@@ -86,10 +88,14 @@ def main():
     return combo.sort_values('Buy/Sell Ratio',ascending = False).head(100)
 
 
+def handle_args():
+    #TODO: Implement this
+    pass
+
+
 def symbol_to_cik(symbols):
     """Returns a list of CIK numbers corresponding to their given symbol"""
-    #TODO: Use edger global here
-    ticker_cik = pd.read_csv(r'Save and insert path to ticker_cik_edgar_cik.csv', delimiter=',')
+    ticker_cik = pd.read_csv(TICKER_EDGAR_CIK_CSV_PATH, delimiter=',')
     df = pd.DataFrame(ticker_cik)
     df.set_index('Ticker', inplace=True)
     new_symbols = [i.lower() for i in symbols]
@@ -99,8 +105,7 @@ def symbol_to_cik(symbols):
 
 def cik_to_symbol(ciks):
     """Returns a list of symbols corresponding to their given CIK numbers"""
-    #TODO: Use edger global here
-    ticker_cik = pd.read_csv(r'Save and insert path to ticker_cik_edgar_cik.csv', delimiter=',')
+    ticker_cik = pd.read_csv(TICKER_EDGAR_CIK_CSV_PATH, delimiter=',')
     df = pd.DataFrame(ticker_cik)
     df.set_index('CIK', inplace=True)
     df = df[~df.index.duplicated(keep='first')]
