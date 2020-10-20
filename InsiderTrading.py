@@ -1,4 +1,6 @@
+from datetime import date
 import requests
+
 from bs4 import BeautifulSoup
 import pandas as pd
 from IPython.display import clear_output
@@ -10,11 +12,12 @@ TICKER_EDGAR_CIK = None
 
 def main():
     """Pulls insider trading statistics"""
-    #TODO: Switch on user input to determine which csv to use
+    #TODO: Switch on arg to determine which csv to use
     ticker_csv = pd.read_csv(TICKER_EDGAR_CIK_CSV_PATH, delimiter=',')
     symbols = [i.upper() for i in ticker_csv.Ticker]
-    
-    end = '2020-01-01'
+
+    #TODO: Switch on arg to determine the end date
+    end = date.today()
     dfs = []
     with tqdm(total = len(symbols)) as pbar:
         for i in range(len(symbols)):
