@@ -19,51 +19,53 @@ def main():
     #TODO: Switch on arg to determine the end date
     end = date.today()
     dfs = []
-    with tqdm(total = len(symbols)) as pbar:
+    with tqdm(total=len(symbols)) as pbar:
         for i in range(len(symbols)):
             try:
                 lst = [symbols[i]]
                 cik = symbol_to_cik(lst)
                 page = 0
-                beg_url = 'https://www.sec.gov/cgi-bin/own-disp?action=getissuer&CIK='+str(cik[0])+'&type=&dateb=&owner=include&start='+str(page*80)
+                beg_url = 'https://www.sec.gov/cgi-bin/own-disp?action=getissuer&CIK=' + str(
+                    cik[0]) + '&type=&dateb=&owner=include&start=' + str(page * 80)
                 urls = [beg_url]
                 df_data = []
                 for url in urls:
                     soup = to_soup(url)
-                    transaction_report = soup.find('table', {'id':'transaction-report'})
+                    transaction_report = soup.find('table', {'id': 'transaction-report'})
 
                     t_chil = [i for i in transaction_report.children]
                     t_cont = [i for i in t_chil if i != '\n']
 
-                    headers = [ i for i in t_cont[0].get_text().split('\n') if i != '']
-                    data_rough = [i for lst in t_cont[1:] for i in lst.get_text().split('\n') if i != '' ]
-                    data = [data_rough[i:i+12] for i in range(0,len(data_rough), 12)]
+                    headers = [i for i in t_cont[0].get_text().split('\n') if i != '']
+                    data_rough = [i for lst in t_cont[1:] for i in lst.get_text().split('\n') if i != '']
+                    data = [data_rough[i:i + 12] for i in range(0, len(data_rough), 12)]
                     last_line = data[-1]
                     for i in data:
-                        if (end > i[1]):
+                        if end > i[1]:
                             break
                         else:
-                            if (i != last_line):
+                            if i != last_line:
                                 df_data.append(i)
                             else:
                                 df_data.append(i)
                                 page += 1
-                                urls.append('https://www.sec.gov/cgi-bin/own-disp?action=getissuer&CIK='+str(cik[0])+'&type=&dateb=&owner=include&start='+str(page*80))
+                                urls.append('https://www.sec.gov/cgi-bin/own-disp?action=getissuer&CIK=' + str(
+                                    cik[0]) + '&type=&dateb=&owner=include&start=' + str(page * 80))
 
-                df = pd.DataFrame(df_data,columns = headers)                
+                df = pd.DataFrame(df_data, columns=headers)
                 df['Purch'] = pd.to_numeric(df['Acquistion or Disposition'].apply(lambda x: 1 if x == 'A' else 0)
-                               *df['Number of Securities Transacted'])
+                                            * df['Number of Securities Transacted'])
                 df['Sale'] = pd.to_numeric(df['Acquistion or Disposition'].apply(lambda x: 1 if x == 'D' else 0)
-                               *df['Number of Securities Transacted'])
+                                           * df['Number of Securities Transacted'])
                 purch = df['Acquistion or Disposition'] == 'A'
                 sale = df['Acquistion or Disposition'] == 'D'
                 num_purch = len(df[purch])
                 num_sale = len(df[sale])
                 total_purch = int(df['Purch'].sum(skipna=True))
                 total_sale = int(df['Sale'].sum(skipna=True))
-                avg_purch = int(total_purch/num_purch)
-                avg_sale = int(total_sale/num_sale)
-                ratio = round(num_purch/num_sale, 2)
+                avg_purch = int(total_purch / num_purch)
+                avg_sale = int(total_sale / num_sale)
+                ratio = round(num_purch / num_sale, 2)
                 new_df = pd.DataFrame({'Symbol': lst[0],
                                        'Purchases': num_purch,
                                        'Sales': num_sale,
@@ -72,7 +74,7 @@ def main():
                                        'Total Sold': f'{total_sale:,}',
                                        'Avg Shares Bought': f'{avg_purch:,}',
                                        'Avg Shares Sold': f'{avg_sale:,}'},
-                                        index = [0])
+                                      index=[0])
 
                 new_df.set_index('Symbol', inplace=True)
                 dfs.append(new_df)
@@ -81,14 +83,14 @@ def main():
                 pbar.update(1)
                 continue
 
-    combo = pd.concat(dfs)    
-    clear_output(wait=True)
-    print('SCAN COMPLETE for period beginning: ' + end)
     combo = pd.concat(dfs)
-    
+    clear_output(wait=True)
+    print('SCAN COMPLETE for period beginning: ', end)
+    combo = pd.concat(dfs)
+
     #combo.to_excel('Insert path where you want to save the .xlsx file', index = True)
-    
-    return combo.sort_values('Buy/Sell Ratio',ascending = False).head(100)
+
+    return combo.sort_values('Buy/Sell Ratio', ascending=False).head(100)
 
 
 def handle_args():
