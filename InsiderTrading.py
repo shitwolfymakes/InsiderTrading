@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 TICKER_EDGAR_CIK_CSV_PATH = 'ticker_and_edgar_cik.csv'
 TICKER_EDGAR_CIK = None
-XLSX_OUTPUT_FILENAME = "output.xlsx"
+XLSX_OUTPUT_FILENAME = 'insider_trading_output.xlsx'
 
 
 def main():
