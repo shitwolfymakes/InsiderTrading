@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 TICKER_EDGAR_CIK_CSV_PATH = 'ticker_and_edgar_cik.csv'
 TICKER_EDGAR_CIK = None
+XLSX_OUTPUT_FILENAME = "output.xlsx"
 
 
 def main():
@@ -16,8 +17,8 @@ def main():
     ticker_csv = pd.read_csv(TICKER_EDGAR_CIK_CSV_PATH, delimiter=',')
     symbols = [i.upper() for i in ticker_csv.Ticker]
 
-    #TODO: Switch on arg to determine the end date
-    end = date.today()
+    #TODO: Switch on arg to determine the start date
+    start_date = str(date.today())
     dfs = []
     with tqdm(total=len(symbols)) as pbar:
         for i in range(len(symbols)):
@@ -41,7 +42,7 @@ def main():
                     data = [data_rough[i:i + 12] for i in range(0, len(data_rough), 12)]
                     last_line = data[-1]
                     for j in data:
-                        if end > j[1]:
+                        if start_date > j[1]:
                             break
                         else:
                             if j != last_line:
@@ -83,12 +84,11 @@ def main():
                 pbar.update(1)
                 continue
 
-    combo = pd.concat(dfs)
     clear_output(wait=True)
-    print('SCAN COMPLETE for period beginning: ', end)
+    print('SCAN COMPLETE for period beginning: ' + start_date)
     combo = pd.concat(dfs)
 
-    #combo.to_excel('Insert path where you want to save the .xlsx file', index = True)
+    combo.to_excel(XLSX_OUTPUT_FILENAME, index=True)
 
     return combo.sort_values('Buy/Sell Ratio', ascending=False).head(100)
 
