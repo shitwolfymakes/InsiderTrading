@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 import requests
 
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ def main():
     symbols = [i.upper() for i in ticker_csv.Ticker]
 
     #TODO: Switch on arg to determine the start date
-    start_date = str(date.today())
+    start_date = str(date.today() - timedelta(days=14))
     dfs = []
     with tqdm(total=len(symbols)) as pbar:
         for i in range(len(symbols)):
