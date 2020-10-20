@@ -40,14 +40,14 @@ def main():
                     data_rough = [i for lst in t_cont[1:] for i in lst.get_text().split('\n') if i != '']
                     data = [data_rough[i:i + 12] for i in range(0, len(data_rough), 12)]
                     last_line = data[-1]
-                    for i in data:
-                        if end > i[1]:
+                    for j in data:
+                        if end > j[1]:
                             break
                         else:
-                            if i != last_line:
-                                df_data.append(i)
+                            if j != last_line:
+                                df_data.append(j)
                             else:
-                                df_data.append(i)
+                                df_data.append(j)
                                 page += 1
                                 urls.append('https://www.sec.gov/cgi-bin/own-disp?action=getissuer&CIK=' + str(
                                     cik[0]) + '&type=&dateb=&owner=include&start=' + str(page * 80))
